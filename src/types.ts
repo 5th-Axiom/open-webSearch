@@ -4,4 +4,6 @@ export interface SearchResult {
     description: string;
     source: string;
     engine: string;
+    engines?: string[];
+    score?: number;
 }
