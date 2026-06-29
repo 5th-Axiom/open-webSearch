@@ -237,13 +237,22 @@ async function testSearchToolPassesSearchModeOverride(): Promise<void> {
         query: 'Open WebSearch',
         limit: 2,
         searchMode: 'playwright',
+        aggregationMode: 'deep',
+        perEngineLimit: 4,
+        ranking: 'rrf',
+        engineWeights: {
+            bing: 2
+        },
+        dedupe: true,
         engines: ['bing']
     });
     const payload = JSON.parse(response.content[0].text) as {
-        results: Array<{ description: string }>;
+        results: Array<{ description: string; engines?: string[]; score?: number }>;
     };
 
-    assertEqual(payload.results[0].description, 'Open WebSearch:2:playwright', 'MCP search should pass request-level search mode');
+    assertEqual(payload.results[0].description, 'Open WebSearch:4:playwright', 'MCP search should pass aggregation options and search mode');
+    assertEqual(payload.results[0].engines?.join(','), 'bing', 'MCP search aggregation output should include engines');
+    assert(typeof payload.results[0].score === 'number', 'MCP search aggregation output should include score');
     assertEqual(seenCalls[0].searchMode, 'playwright', 'MCP handler should forward search mode');
 
     console.log('✅ MCP search tool passes search-mode override');
@@ -505,7 +514,9 @@ function testConfigDrivenEngineSelectionAndMode(): void {
     assert(
         descriptionPayload.searchDescription.includes('omit or set auto to use the server configured SEARCH_MODE') &&
         descriptionPayload.searchDescription.includes('request forces request-based search') &&
-        descriptionPayload.searchDescription.includes('playwright forces browser-based search'),
+        descriptionPayload.searchDescription.includes('playwright forces browser-based search') &&
+        descriptionPayload.searchDescription.includes('aggregationMode fast/balanced/deep') &&
+        descriptionPayload.searchDescription.includes('ranking engine-order/rrf'),
         'search description should explain searchMode enum meanings'
     );
 
