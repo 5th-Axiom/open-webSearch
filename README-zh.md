@@ -291,6 +291,26 @@ SEARCH_MODE=request npx open-websearch@latest
 DEFAULT_SEARCH_ENGINE=duckduckgo ENABLE_CORS=true USE_PROXY=true PROXY_URL=http://127.0.0.1:7890 PORT=8080 npx open-websearch@latest
 ```
 
+多引擎聚合搜索示例：
+
+```bash
+npm run search:cli -- "open web search" \
+  --engines duckduckgo,bing,startpage \
+  --limit 5 \
+  --aggregation-mode deep \
+  --per-engine-limit 5 \
+  --ranking rrf \
+  --engine-weight bing=1.2 \
+  --json
+```
+
+聚合搜索参数说明：
+- `aggregationMode` / `--aggregation-mode` 支持 `fast`、`balanced`、`deep`。
+- `limit` 控制最终返回结果数，`perEngineLimit` / `--per-engine-limit` 控制每个引擎的候选池大小。
+- `ranking=rrf` / `--ranking rrf` 使用 Reciprocal Rank Fusion 融合排序。
+- `engineWeights` / `--engine-weight engine=weight` 可调整 RRF 中不同引擎的权重。
+- `dedupe` / `--no-dedupe` 控制是否进行 URL 归一化去重与多引擎来源合并。
+
 浏览器增强 Bing 兜底现在是显式启用，不随发行包默认安装。你可以按下面几种方式手动启用：
 
 1. 本地完整安装 Playwright：

@@ -118,9 +118,23 @@ Run a one-shot local CLI search:
 npm run search:cli -- "open web search" --json
 ```
 
+Run a multi-engine aggregated search:
+
+```bash
+npm run search:cli -- "open web search" \
+  --engines duckduckgo,bing,startpage \
+  --limit 5 \
+  --aggregation-mode deep \
+  --per-engine-limit 5 \
+  --ranking rrf \
+  --engine-weight bing=1.2 \
+  --json
+```
+
 Notes:
 - Bare `open-websearch` is the MCP server compatibility entrypoint, not the recommended daemon start command for agent automation.
 - For content extraction, prefer searching first and then fetching a more specific result page. Some homepages and JS-heavy landing pages may not expose readable article text through `fetch-web`.
+- Multi-engine aggregation accepts `aggregationMode` / `--aggregation-mode` as `fast`, `balanced`, or `deep`. `limit` caps the final returned results; `perEngineLimit` / `--per-engine-limit` controls each engine's candidate pool. `ranking=rrf` / `--ranking rrf` uses Reciprocal Rank Fusion, `engineWeights` / `--engine-weight engine=weight` adjusts RRF scoring, and `dedupe` / `--no-dedupe` controls URL normalization merging.
 
 For the local daemon HTTP API (`serve`, `status`, `GET /health`, `POST /search`, `POST /fetch-*`), see [docs/http-api.md](docs/http-api.md).
 
